@@ -42,28 +42,36 @@ jobs:
     runs-on: macos-14
     env:
       MINICONDA_DIST: Miniconda3-py311_24.1.2-0-MacOSX-x86_64
+      PLATYPUS_RESOURCES: /Applications/Platypus.app/Contents/Resources
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Install build tools
         run: |
           brew install --cask platypus
-          gunzip  /Applications/Platypus.app/Contents/Resources/platypus_clt.gz
+          sudo mkdir -p /usr/local/share/platypus
+          gunzip ${PLATYPUS_RESOURCES}/platypus_clt.gz
+          gunzip ${PLATYPUS_RESOURCES}/ScriptExec.gz
+          chmod +x ${PLATYPUS_RESOURCES}/ScriptExec
+          sudo cp ${PLATYPUS_RESOURCES}/ScriptExec /usr/local/share/platypus/ScriptExec
+          sudo cp -r ${PLATYPUS_RESOURCES}/MainMenu.nib /usr/local/share/platypus/MainMenu.nib
           curl -o miniconda.sh https://repo.anaconda.com/miniconda/${MINICONDA_DIST}.sh
           chmod +x miniconda.sh
           ./miniconda.sh -b -p ./miniconda -u
-      - name: Setup build environment
+      - name: Build and Package
         run: |
           miniconda/bin/conda init bash
           . ~/.bash_profile
           conda create -y -n py3 python=3.11 pip
-      - name: Build
-        working-directory: .github/workflows/mac
-        run: |
-          /Applications/Platypus.app/Contents/Resources/platypus_clt -a OpenCRAVAT -u "Karchin Lab" -V $VERSION -I org.karchinlab.open-cravat -i AppIcon.icns -y ./script ./OpenCRAVAT.app
           conda activate py3
+          cd .build/mac
+          ${PLATYPUS_RESOURCES}/platypus_clt -a OpenCRAVAT -u "Karchin Lab" -V $VERSION -I org.karchinlab.open-cravat -i ./AppIcon.icns -y ./script ./OpenCRAVAT.app
           ./make.sh $VERSION
           ./package.sh $VERSION
       - name: Archive installer package
         uses: actions/upload-artifact@v4
         with:
           name: mac-installer
-          path: .github/workflows/mac/OpenCRAVAT.${{github.ref_name}}.pkg
+          path: .build/mac/OpenCRAVAT.${{env.VERSION}}.pkg

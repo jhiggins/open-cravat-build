@@ -1,7 +1,10 @@
+#!/usr/bin/env bash
 # conda should be installed.
 # python3.10 environment should be setup.
 # Change the variables below as needed.
-CONDADIR=`realpath ../miniconda`
+set -ex
+
+CONDADIR=`realpath ../../miniconda`
 ENVNAME=py3
 APPDIR=./OpenCRAVAT.app
 LAUNCHDIR=./launchers
@@ -26,7 +29,6 @@ cp -R $LAUNCHDIR $RESDIR/
 cp $APPDIR/Contents/Info.plist $RESDIR/Info.plist.bak
 
 plutil -replace CFBundleShortVersionString -string $1 $APPDIR/Contents/Info.plist
-
 
 cd $RESDIR/bin
 sed -i '' "s=${ENVDIR}/bin/python=/usr/bin/env python -I=g" oc

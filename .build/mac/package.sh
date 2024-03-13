@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -ex
 pkgbuild --root ./OpenCRAVAT.app  --identifier org.karchinlab.open-cravat --scripts Scripts --install-location /Applications/OpenCRAVAT.app OpenCRAVAT.pkgbuild.pkg
 
 title="OpenCRAVAT."
