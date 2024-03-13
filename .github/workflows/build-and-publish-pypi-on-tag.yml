@@ -55,4 +55,15 @@ jobs:
           miniconda/bin/conda init bash
           . ~/.bash_profile
           conda create -y -n py3 python=3.11 pip
-          pwd
+      - name: Build
+        working-directory: .github/workflows/mac
+        run: |
+          /Applications/Platypus.app/Contents/Resources/platypus_clt -a OpenCRAVAT -u "Karchin Lab" -V $VERSION -I org.karchinlab.open-cravat -i AppIcon.icns -y ./script ./OpenCRAVAT.app
+          conda activate py3
+          ./make.sh $VERSION
+          ./package.sh $VERSION
+      - name: Archive installer package
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-installer
+          path: .github/workflows/mac/OpenCRAVAT.${{github.ref_name}}.pkg
