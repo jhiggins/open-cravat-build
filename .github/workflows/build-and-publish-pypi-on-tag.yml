@@ -5,7 +5,7 @@ on:
     tags:
       - "*.*.*"
 env:
-  VERSION: 2.5.0
+  VERSION: ${{github.ref_name}}
 
 jobs:
   # pypi:
