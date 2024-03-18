@@ -5,9 +5,8 @@ on:
     tags:
       - "*.*.*"
 env:
-#  VERSION: ${{github.ref_name}}
-  VERSION: 2.5.0
-
+  VERSION: ${{github.ref_name}}
+ 
 jobs:
   # pypi:
   #   runs-on: ubuntu-latest
