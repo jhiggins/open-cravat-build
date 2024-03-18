@@ -52,7 +52,7 @@ jobs:
       - name: Build and Package
         working-directory: .build\windows
         run: |
-          .\build.ps1 OpenCravat==${{env.VERSION}} -Clean -ForceDownload -Build
+          .\build.ps1 open-cravat==${{env.VERSION}} -Clean -ForceDownload -Build
       - name: Archive installer package
         uses: actions/upload-artifact@v4
         with:
