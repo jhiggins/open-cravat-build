@@ -5,7 +5,8 @@ on:
     tags:
       - "*.*.*"
 env:
-  VERSION: ${{github.ref_name}}
+#  VERSION: ${{github.ref_name}}
+  VERSION: 2.5.0
 
 jobs:
   # pypi:
@@ -49,7 +50,7 @@ jobs:
         run: |
           choco install innosetup
       - name: Build and Package
-        workdir: .build\windows
+        working-directory: .build\windows
         run: |
           .\build.ps1 OpenCravat==${{env.VERSION}} -Clean -ForceDownload -Build
       - name: Archive installer package
