@@ -3,6 +3,10 @@ param(
         HelpMessage="Where to find open-cravat. A pypi name or path to repositry"
     )]
     [string]$PipTarget,
+    [Parameter(Mandatory=$true,
+        HelpMessage="The version to embed in the built package."
+    )]
+    [string]$CravatVersion,
     [Parameter(Mandatory=$false,
         HelpMessage="Remove installation target directory before running"
         )]
@@ -80,13 +84,12 @@ if (-Not(Test-Path -Path $binDir/oc.exe -PathType Leaf)) {
 # Copy icon
 Copy-Item -Path $icoPath -Destination $baseDir
 
-$ocVersion=& $binDir/oc.exe version
 Write-Output ""
-Write-Output "Finished setup for version $ocVersion"
+Write-Output "Finished setup for version $CravatVersion"
 
 if ($Build) {
-    $installerName="OpenCRAVAT-$ocVersion"
-    & $ISCC /Qp /F$installerName /DVersion=$ocVersion $issPath
+    $installerName="OpenCRAVAT-$CravatVersion"
+    & $ISCC /Qp /F$installerName /DVersion=$CravatVersion $issPath
     Write-Output ""
     Write-Output "Installer created"
     Write-Output "Output\$installerName.exe"

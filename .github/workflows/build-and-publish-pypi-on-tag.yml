@@ -5,11 +5,13 @@ on:
     tags:
       - "*.*.*"
 env:
-  VERSION: ${{github.ref_name}}
- 
+  # Workarouund for no ternary operator, use short-circuiting
+  VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'DEV' }}
+
 jobs:
   # pypi:
   #   runs-on: ubuntu-latest
+  #   if: startsWith(github.ref, 'refs/tags/')
   #   steps:
   #     - name: Build pypi package
   #       run: echo "Building package on release"
@@ -25,6 +27,7 @@ jobs:
 
   # docker:
   #   runs-on: ubuntu-latest
+  #   if: startsWith(github.ref, 'refs/tags/')
   #   steps:
   #     - uses: actions/checkout@v2
   #     - name: Login to Docker Hub
@@ -38,9 +41,10 @@ jobs:
   #         context: .
   #         push: true
   #         tags: ${{ secrets.DOCKER_USERNAME }}/opencravat:${{ github.sha }}
+
   windows:
     runs-on: windows-latest
-    steps: 
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -51,12 +55,19 @@ jobs:
       - name: Build and Package
         working-directory: .build\windows
         run: |
-          .\build.ps1 open-cravat==${{env.VERSION}} -Clean -ForceDownload -Build
+          .\build.ps1 ..\.. ${{env.VERSION}} -Clean -ForceDownload -Build
       - name: Archive installer package
         uses: actions/upload-artifact@v4
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
           name: windows-installer
           path: .build\windows\Output\OpenCRAVAT-${{env.VERSION}}.exe
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            .build\windows\Output\OpenCRAVAT-${{env.VERSION}}.exe
 
   mac:
     runs-on: macos-14
@@ -88,10 +99,17 @@ jobs:
           conda activate py3
           cd .build/mac
           ${PLATYPUS_RESOURCES}/platypus_clt -a OpenCRAVAT -u "Karchin Lab" -V $VERSION -I org.karchinlab.open-cravat -i ./AppIcon.icns -y ./script ./OpenCRAVAT.app
-          ./make.sh $VERSION
+          ./make.sh ../..
           ./package.sh $VERSION
       - name: Archive installer package
         uses: actions/upload-artifact@v4
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
           name: mac-installer
           path: .build/mac/OpenCRAVAT.${{env.VERSION}}.pkg
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            .build/mac/OpenCRAVAT.${{env.VERSION}}.pkg

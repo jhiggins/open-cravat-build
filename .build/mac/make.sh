@@ -8,17 +8,23 @@ CONDADIR=`realpath ../../miniconda`
 ENVNAME=py3
 APPDIR=./OpenCRAVAT.app
 LAUNCHDIR=./launchers
+INSTALL_PATH=$1
 
-if [ -z $1 ]; then
-	echo "What is the version of open-cravat?"
+if [ -z $INSTALL_PATH ]; then
+	echo "What is the path to open-cravat?"
 	exit
+fi
+
+if ! [ -f $INSTALL_PATH/setup.py ]; then
+  echo "$INSTALL_PATH is not a path to a python package root."
+  exit
 fi
 
 source $CONDADIR/etc/profile.d/conda.sh
 conda activate $ENVNAME
 
 pip uninstall open-cravat -y
-pip install open-cravat==$1
+pip install $INSTALL_PATH
 
 ENVDIR=$CONDADIR/envs/$ENVNAME
 RESDIR=$APPDIR/Contents/Resources
