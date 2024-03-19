@@ -92,5 +92,5 @@ if ($Build) {
     & $ISCC /Qp /F$installerName /DVersion=$CravatVersion $issPath
     Write-Output ""
     Write-Output "Installer created"
-    Write-Output "Output\$installerName.exe"
+    Write-Output "$pwd\Output\$installerName.exe"
 }
